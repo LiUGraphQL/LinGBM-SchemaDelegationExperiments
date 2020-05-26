@@ -2,12 +2,6 @@ import {
   makeRemoteExecutableSchema,
   introspectSchema,
   makeExecutableSchema,
-  delegateToSchema,
-  transformSchema,
-  RenameTypes,
-  RenameRootFields,
-  TransformRootFields,
-  TransformObjectFields,
 } from "graphql-tools";
 import { HttpLink } from "apollo-link-http";
 import { ApolloServer } from "apollo-server";
