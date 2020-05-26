@@ -1,0 +1,25 @@
+{
+  "name": "schema-delegation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "apollo-link": "^1.2.2",
+    "apollo-link-http": "^1.5.4",
+    "apollo-server": "^2.0.5",
+    "graphql-tools": "^3.1.1",
+    "node-fetch": "^2.2.0",
+    "prettier": "^2.0.5"
+  },
+  "devDependencies": {
+    "esm": "^3.0.77",
+    "graphql": "^14.6.0",
+    "object-assign": "^4.1.1"
+  },
+  "scripts": {
+    "start": "node -r esm index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
