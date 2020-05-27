@@ -13,14 +13,7 @@ export const lecturer = (schema) => {
         },
         context,
         info,
-        transforms: [
-          {
-            transformResult: (result) => {
-              return result;
-            },
-          },
-          WrapFields("lecturer_by_pk", [createField("nr")]),
-        ],
+        transforms: [WrapFields("lecturer_by_pk", [createField("nr")])],
       });
       return results;
     },
