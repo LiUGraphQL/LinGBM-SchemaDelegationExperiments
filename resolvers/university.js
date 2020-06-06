@@ -135,6 +135,7 @@ export const University = (schema) => {
               };
             }
           });
+          where._and = [where._and];
         }
         args.where = where;
         const results = await delegateToSchema({

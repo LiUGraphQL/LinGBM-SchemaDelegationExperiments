@@ -1,9 +1,10 @@
-import { delegateToSchema } from "graphql-tools";
+import { delegateToSchema, WrapQuery } from "graphql-tools";
 import {
   createField,
   createTWoLayeredField,
   WrapFields,
   facultyByPk,
+  ExtractField,
 } from "./util";
 
 export const faculty = (schema) => {
@@ -33,7 +34,26 @@ export const faculty = (schema) => {
         },
         context,
         info,
-        transforms: [WrapFields("faculty_by_pk", fields)],
+        transforms: [
+          new WrapQuery(
+            // path at which to apply wrapping and extracting
+            ["faculty_by_pk"],
+            (subtree) => {
+              if (!subtree)
+                return {
+                  kind: "SelectionSet",
+                  selections: [...fields],
+                };
+              subtree.selections = [...subtree.selections, ...fields];
+              return subtree;
+            },
+            // how to process the data result at path
+            (result) => {
+              result.emailAddress = result.emailaddress;
+              return result;
+            }
+          ),
+        ],
       });
     },
   };
@@ -75,19 +95,20 @@ const shared = (schema) => {
       return parent.universityByDoctoraldegreefrom;
     },
     emailAddress: async (parent, args, context, info) => {
-      if (!parent.emailaddress) {
-        const results = await facultyByPk(
-          parent.nr,
-          [createField("emailaddress")],
+      if (!parent.emailAddress) {
+        return await delegateToSchema({
           schema,
-          parent,
-          args,
+          operation: "query",
+          fieldName: "faculty_by_pk",
+          args: {
+            nr: parseInt(parent.nr),
+          },
           context,
-          info
-        );
-        return results ? results.emailaddress : null;
+          info,
+          transforms: [ExtractField("faculty_by_pk", "emailaddress")],
+        });
       }
-      return parent.emailaddress;
+      return parent.emailAddress;
     },
     worksFor: async (parent, args, context, info) => {
       if (!parent.department) {
@@ -107,8 +128,9 @@ const shared = (schema) => {
       if (!parent.publications) {
         if (args.order) {
           const { field, direction } = args.order;
-          args.order_by = {};
-          args.order_by[field] = direction == "ASC" ? "asc" : "desc";
+          args.order_by = [];
+          args.order_by.push({});
+          args.order_by[0][field] = direction == "ASC" ? "asc" : "desc";
         }
         args.where = { mainauthor: { _in: [parent.nr] } };
         return await delegateToSchema({

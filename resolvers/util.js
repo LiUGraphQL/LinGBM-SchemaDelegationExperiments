@@ -41,6 +41,26 @@ export const WrapFields = (path, fields) => {
   );
 };
 
+export const ExtractField = (path, field) => {
+  return new WrapQuery(
+    // path at which to apply wrapping and extracting
+    [path],
+    (subtree) => {
+      if (!subtree)
+        return {
+          kind: "SelectionSet",
+          selections: [createField(field)],
+        };
+      subtree.selections = [...subtree.selections, createField(field)];
+      return subtree;
+    },
+    // how to process the data result at path
+    (result) => {
+      return result[field];
+    }
+  );
+};
+
 export const universityByPk = async (
   pk,
   fields,

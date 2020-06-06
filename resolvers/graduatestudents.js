@@ -1,7 +1,8 @@
-import { delegateToSchema } from "graphql-tools";
+import { delegateToSchema, WrapQuery } from "graphql-tools";
 import {
   createField,
   createTWoLayeredField,
+  ExtractField,
   graduateStudentByPk,
   WrapFields,
 } from "./util";
@@ -66,19 +67,21 @@ export const GraduateStudent = (schema) => {
       return parent.nr;
     },
     emailAddress: async (parent, args, context, info) => {
-      if (!parent.emailaddress) {
-        const student = await graduateStudentByPk(
-          parent.nr,
-          [createField("emailaddress")],
+      if (!parent.emailAddress) {
+        const student = await delegateToSchema({
           schema,
-          parent,
+          operation: "query",
+          fieldName: "graduatestudent_by_pk",
+          args: {
+            nr: parseInt(parent.nr),
+          },
           context,
-          info
-        );
-        if (!student || !student.emailaddress) return null;
-        return student.emailaddress;
+          info,
+          transforms: [ExtractField("graduatestudent_by_pk", "emailaddress")],
+        });
+        return student;
       }
-      return parent.emailaddress;
+      return parent.emailAddress;
     },
     advisor: async (parent, args, context, info) => {
       if (!parent.professor) {
@@ -114,17 +117,36 @@ export const GraduateStudent = (schema) => {
       const field = createTWoLayeredField("graduatestudenttakecourses", [
         createTWoLayeredField("graduatecourse", [createField("nr")]),
       ]);
-      const results = await graduateStudentByPk(
-        parent.nr,
-        [field],
+      const student = await delegateToSchema({
         schema,
-        parent,
+        operation: "query",
+        fieldName: "graduatestudent_by_pk",
+        args: {
+          nr: parseInt(parent.nr),
+        },
         context,
-        info
-      );
-      return results && results.graduatestudenttakecourses
-        ? results.graduatestudenttakecourses.map((item) => item.graduatecourse)
-        : null;
+        info,
+        transforms: [
+          new WrapQuery(
+            // path at which to apply wrapping and extracting
+            ["graduatestudent_by_pk"],
+            (subtree) => {
+              if (!subtree)
+                return {
+                  kind: "SelectionSet",
+                  selections: [field],
+                };
+              subtree.selections = [...subtree.selections, field];
+              return subtree;
+            },
+            (result) => {
+              console.log(result);
+              return result.graduatestudenttakecourses;
+            }
+          ),
+        ],
+      });
+      return student.map((item) => item.graduatecourse);
     },
   };
 };
