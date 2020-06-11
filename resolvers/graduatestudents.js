@@ -17,11 +17,13 @@ const modifyWhereClause = (where) => {
 
 const modifyOrderClause = (args) => {
   const clauses = args.order;
-  args.order_by = {};
+  let order_by = {};
+
   clauses.map((item) => {
-    if (item === "id") args.order_by.nr = "asc";
-    else args.order_by[item.toLowerCase()] = "asc";
+    if (item === "id") order_by.nr = "asc";
+    else order_by[item.toLowerCase()] = "asc";
   });
+  args.order_by = [order_by];
 };
 
 export const storeAndRemoveAdvisor = (selectionSet) => {
