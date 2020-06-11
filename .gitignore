@@ -1,4 +1,4 @@
-appnotes.md
-node_modules
-.idea
-package-lock.json
+src/appnotes.md
+src/node_modules
+src/.idea
+src/package-lock.json
