@@ -4,7 +4,7 @@ import {
   createTWoLayeredField,
   WrapFields,
   facultyByPk,
-  ExtractField,
+  GetField,
 } from "./util";
 
 export const faculty = (schema) => {
@@ -105,7 +105,7 @@ const shared = (schema) => {
           },
           context,
           info,
-          transforms: [ExtractField("faculty_by_pk", "emailaddress")],
+          transforms: [GetField("faculty_by_pk", "emailaddress")],
         });
       }
       return parent.emailAddress;

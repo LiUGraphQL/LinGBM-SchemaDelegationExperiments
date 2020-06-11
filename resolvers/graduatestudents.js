@@ -2,7 +2,7 @@ import { delegateToSchema, WrapQuery } from "graphql-tools";
 import {
   createField,
   createTWoLayeredField,
-  ExtractField,
+  GetField,
   graduateStudentByPk,
   WrapFields,
 } from "./util";
@@ -79,7 +79,7 @@ export const GraduateStudent = (schema) => {
           },
           context,
           info,
-          transforms: [ExtractField("graduatestudent_by_pk", "emailaddress")],
+          transforms: [GetField("graduatestudent_by_pk", "emailaddress")],
         });
         return student;
       }

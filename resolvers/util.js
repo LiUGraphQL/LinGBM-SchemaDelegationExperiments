@@ -41,7 +41,7 @@ export const WrapFields = (path, fields) => {
   );
 };
 
-export const ExtractField = (path, field) => {
+export const GetField = (path, field) => {
   return new WrapQuery(
     // path at which to apply wrapping and extracting
     [path],
