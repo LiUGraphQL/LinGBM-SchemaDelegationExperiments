@@ -20,7 +20,7 @@ export const faculty = (schema) => {
       }
       if (selections.includes("doctoralDegreeFrom")) {
         fields.push(
-          createTWoLayeredField("universityByDoctoraldegreefrom", [
+          createTWoLayeredField("university", [
             createField("nr"),
           ])
         );
@@ -75,11 +75,11 @@ const shared = (schema) => {
       return parent.nr;
     },
     doctoralDegreeFrom: async (parent, args, context, info) => {
-      if (!parent.universityByDoctoraldegreefrom) {
+      if (!parent.university) {
         const results = await facultyByPk(
           parent.nr,
           [
-            createTWoLayeredField("universityByDoctoraldegreefrom", [
+            createTWoLayeredField("university", [
               createField("nr"),
             ]),
           ],
@@ -89,10 +89,10 @@ const shared = (schema) => {
           context,
           info
         );
-        if (!results || !results.universityByDoctoraldegreefrom) return null;
-        return results.universityByDoctoraldegreefrom;
+        if (!results || !results.university) return null;
+        return results.university;
       }
-      return parent.universityByDoctoraldegreefrom;
+      return parent.university;
     },
     emailAddress: async (parent, args, context, info) => {
       if (!parent.emailAddress) {

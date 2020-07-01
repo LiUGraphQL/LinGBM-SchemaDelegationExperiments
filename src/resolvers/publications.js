@@ -6,7 +6,7 @@ export const publicationSearch = (schema) => {
     publicationSearch: async (parent, args, context, info) => {
       args.where = {};
       args.where[args.field] = {
-        _like: args.pattern,
+        _like: "%"+args.pattern+"%",
       };
       return await delegateToSchema({
         schema,
