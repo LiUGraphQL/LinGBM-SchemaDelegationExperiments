@@ -1,4 +1,4 @@
-import { delegateToSchema } from "graphql-tools";
+import { delegateToSchema, WrapQuery } from "graphql-tools";
 import {
   createField,
   createTWoLayeredField,
@@ -52,6 +52,47 @@ export const Department = (schema) => {
         transforms: [WrapFields("professor", [createField("nr")])],
       });
       return results && results[0] ? results[0] : null;
+    },
+    subOrganizationOf: async (parent, args, context, info) => {
+      console.log(parent.nr);
+      if (!parent.subOrganizationOf) {
+        const org = await delegateToSchema({
+          schema,
+          operation: "query",
+          fieldName: "department_by_pk",
+          args: {
+            nr: parseInt(parent.nr),
+          },
+          context,
+          info,
+          transforms: [
+            new WrapQuery(
+              // path at which to apply wrapping and extracting
+              ['department_by_pk'],
+              (subtree) => {
+                if (!subtree)
+                  return {
+                    kind: "SelectionSet",
+                    selections: [
+                      createTWoLayeredField("university", [createField("nr")]),
+                    ],
+                  };
+                subtree.selections = [
+                  ...subtree.selections,
+                  createTWoLayeredField("university", [createField("nr")]),
+                ];
+                return subtree;
+              },
+              // how to process the data result at path
+              (result) => {
+                return result && result.university;
+              }
+            ),
+          ],
+        });
+        return org;
+      }
+      return parent.subOrganizationOf;
     },
   };
 };

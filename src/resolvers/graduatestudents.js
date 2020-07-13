@@ -142,7 +142,6 @@ export const GraduateStudent = (schema) => {
               return subtree;
             },
             (result) => {
-              console.log(result);
               return result.graduatestudenttakecourses;
             }
           ),

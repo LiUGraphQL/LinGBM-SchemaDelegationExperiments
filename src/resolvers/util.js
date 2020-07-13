@@ -56,7 +56,7 @@ export const GetField = (path, field) => {
     },
     // how to process the data result at path
     (result) => {
-      return result[field];
+      return result && result[field];
     }
   );
 };
